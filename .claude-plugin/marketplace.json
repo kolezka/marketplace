@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "kolezka",
+  "description": "Claude Code plugins maintained by kolezka",
+  "owner": {
+    "name": "kolezka"
+  },
+  "plugins": [
+    {
+      "name": "block-docs",
+      "description": "Create and maintain evidence-based block documentation",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/block-docs",
+        "ref": "main"
+      },
+      "category": "documentation"
+    }
+  ]
+}
