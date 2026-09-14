@@ -11,6 +11,7 @@ In Claude Code:
 ```text
 /plugin marketplace add kolezka/marketplace
 /plugin install block-docs@kolezka
+/plugin install self-improvement-loop@kolezka
 /reload-plugins
 ```
 
@@ -19,18 +20,19 @@ listed plugin. Install the plugins you want individually.
 
 The marketplace name is `kolezka`, even though the GitHub repository is named
 `marketplace`. Plugin skills keep their own namespace, such as
-`/block-docs:block-docs`.
+`/block-docs:block-docs` or `/self-improvement-loop:reflect`.
 
 ## Plugins
 
 | Plugin | Purpose | Source |
 |---|---|---|
 | `block-docs` | Create, refresh, and audit system documentation by ownership block | [kolezka/block-docs](https://github.com/kolezka/block-docs) |
+| `self-improvement-loop` | Reflect on sessions in the background and promote recurring lessons into skills, hooks, rules and agents, with a local review UI | [kolezka/self-improvement-loop](https://github.com/kolezka/self-improvement-loop) |
 
-**Plugin access:** This catalog is public, but `block-docs` is currently a private
-repository. Installing it requires Git credentials with access to that repository.
-Public access to this marketplace does not grant access to a private plugin.
-Never put credentials in the marketplace manifest.
+**Plugin access:** This catalog is public, but both plugins are currently private
+repositories. Installing them requires Git credentials with access to those
+repositories. Public access to this marketplace does not grant access to a
+private plugin. Never put credentials in the marketplace manifest.
 
 ## Use block-docs
 
@@ -55,6 +57,30 @@ remove that installation before switching to this catalog:
 /reload-plugins
 ```
 
+## Use self-improvement-loop
+
+The plugin needs `bun` (1.4.2 or newer) and `git` on `PATH`, plus a model
+endpoint. After installing, run the first-time setup from a terminal:
+
+```sh
+sil init
+sil web
+```
+
+`sil init` writes the config templates; edit `llm.yaml` to set the three model
+roles before the worker can call a model. In any Claude Code session, `/loop`
+shows status, `/reflect` queues a background reflection on the work just done,
+and `/feedback <type>:<name> good|bad` rates an artifact. See the plugin's
+`docs/INSTALL.md` for scheduling the worker and the web UI.
+
+If you installed it from a local dev marketplace, remove that first:
+
+```text
+/plugin uninstall self-improvement-loop@<dev-marketplace-name>
+/plugin install self-improvement-loop@kolezka
+/reload-plugins
+```
+
 ## Update
 
 From a terminal, refresh the catalog and then the installed plugin:
@@ -62,6 +88,7 @@ From a terminal, refresh the catalog and then the installed plugin:
 ```sh
 claude plugin marketplace update kolezka
 claude plugin update block-docs@kolezka
+claude plugin update self-improvement-loop@kolezka
 ```
 
 Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.
