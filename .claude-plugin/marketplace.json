@@ -22,7 +22,7 @@
       "source": {
         "source": "github",
         "repo": "kolezka/self-improvement-loop",
-        "ref": "main"
+        "ref": "release"
       },
       "category": "productivity"
     }
