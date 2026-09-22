@@ -25,6 +25,16 @@
         "ref": "release"
       },
       "category": "productivity"
+    },
+    {
+      "name": "outline-persist",
+      "description": "Durable work-state persistence for Claude Code sessions, backed by the Outline MCP server. Reads prior context before work and records task start, checkpoints, handoff and completion",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/outline-persist",
+        "ref": "master"
+      },
+      "category": "productivity"
     }
   ]
 }
