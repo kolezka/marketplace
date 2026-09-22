@@ -12,6 +12,7 @@ In Claude Code:
 /plugin marketplace add kolezka/marketplace
 /plugin install block-docs@kolezka
 /plugin install self-improvement-loop@kolezka
+/plugin install outline-persist@kolezka
 /reload-plugins
 ```
 
@@ -20,7 +21,8 @@ listed plugin. Install the plugins you want individually.
 
 The marketplace name is `kolezka`, even though the GitHub repository is named
 `marketplace`. Plugin skills keep their own namespace, such as
-`/block-docs:block-docs` or `/self-improvement-loop:reflect`.
+`/block-docs:block-docs`, `/self-improvement-loop:reflect` or
+`/outline-persist:outline-persist`.
 
 ## Plugins
 
@@ -28,11 +30,12 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 |---|---|---|
 | `block-docs` | Create, refresh, and audit system documentation by ownership block | [kolezka/block-docs](https://github.com/kolezka/block-docs) |
 | `self-improvement-loop` | Reflect on sessions in the background and promote recurring lessons into skills, hooks, rules and agents, with a local review UI | [kolezka/self-improvement-loop](https://github.com/kolezka/self-improvement-loop) |
+| `outline-persist` | Keep durable work state in Outline: read prior context before work, record task start, checkpoints, handoff and completion | [kolezka/outline-persist](https://github.com/kolezka/outline-persist) |
 
-**Plugin access:** This catalog is public, but both plugins are currently private
-repositories. Installing them requires Git credentials with access to those
-repositories. Public access to this marketplace does not grant access to a
-private plugin. Never put credentials in the marketplace manifest.
+**Plugin access:** This catalog and all listed plugin repositories are public.
+If a plugin repository becomes private, installing it requires Git credentials
+with access to that repository; public access to this marketplace does not grant
+access to a private plugin. Never put credentials in the marketplace manifest.
 
 ## Use block-docs
 
@@ -81,6 +84,23 @@ If you installed it from a local dev marketplace, remove that first:
 /reload-plugins
 ```
 
+## Use outline-persist
+
+The plugin needs an `outline` MCP server reachable from the session, plus
+`python3` for redaction. After installing, start a task record and checkpoint it
+as work proceeds:
+
+```text
+/outline-persist:start <task description>
+/outline-persist:checkpoint <what is verified now>
+/outline-persist:complete
+```
+
+`/outline-persist:load` reads prior context, `/outline-persist:handoff` writes a
+handoff record, and `/outline-persist:off` disables the SessionStart hook without
+uninstalling. See the plugin's README for the full lifecycle and the redaction
+rules.
+
 ## Update
 
 From a terminal, refresh the catalog and then the installed plugin:
@@ -89,6 +109,7 @@ From a terminal, refresh the catalog and then the installed plugin:
 claude plugin marketplace update kolezka
 claude plugin update block-docs@kolezka
 claude plugin update self-improvement-loop@kolezka
+claude plugin update outline-persist@kolezka
 ```
 
 Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.
