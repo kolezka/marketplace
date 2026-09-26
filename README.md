@@ -13,6 +13,7 @@ In Claude Code:
 /plugin install block-docs@kolezka
 /plugin install self-improvement-loop@kolezka
 /plugin install outline-persist@kolezka
+/plugin install repo-intel@kolezka
 /reload-plugins
 ```
 
@@ -31,6 +32,7 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 | `block-docs` | Create, refresh, and audit system documentation by ownership block | [kolezka/block-docs](https://github.com/kolezka/block-docs) |
 | `self-improvement-loop` | Reflect on sessions in the background and promote recurring lessons into skills, hooks, rules and agents, with a local review UI | [kolezka/self-improvement-loop](https://github.com/kolezka/self-improvement-loop) |
 | `outline-persist` | Keep durable work state in Outline: read prior context before work, record task start, checkpoints, handoff and completion | [kolezka/outline-persist](https://github.com/kolezka/outline-persist) |
+| `repo-intel` | Install codegraph and graphify in a repository, route the agent to the right graph, and build the graph on your own LLM backend (LiteLLM, Ollama, OpenAI-compatible) | [kolezka/repo-intel](https://github.com/kolezka/repo-intel) |
 
 **Plugin access:** This catalog and all listed plugin repositories are public.
 If a plugin repository becomes private, installing it requires Git credentials
@@ -101,6 +103,15 @@ handoff record, and `/outline-persist:off` disables the SessionStart hook withou
 uninstalling. See the plugin's README for the full lifecycle and the redaction
 rules.
 
+## Use repo-intel
+
+Needs `git` and `jq`. In the repository you want indexed, run
+`/repo-intel:setup`. It installs missing tools after asking, sets the LLM
+backend for graphify's semantic extraction, indexes codegraph, and builds the
+first graph. Rebuild later with `/repo-intel:build` or `repo-intel build`.
+`repo-intel migrate-hooks` lists older global graphify and codegraph hooks that
+the plugin replaces. See the plugin's README for backends and hook behaviour.
+
 ## Update
 
 From a terminal, refresh the catalog and then the installed plugin:
@@ -110,6 +121,7 @@ claude plugin marketplace update kolezka
 claude plugin update block-docs@kolezka
 claude plugin update self-improvement-loop@kolezka
 claude plugin update outline-persist@kolezka
+claude plugin update repo-intel@kolezka
 ```
 
 Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.
