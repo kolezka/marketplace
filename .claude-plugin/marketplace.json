@@ -35,6 +35,16 @@
         "ref": "master"
       },
       "category": "productivity"
+    },
+    {
+      "name": "repo-intel",
+      "description": "Install codegraph and graphify in a repository, route the agent to the right graph with near-zero hook overhead, and build the graphify graph on your own LLM backend (LiteLLM, Ollama, OpenAI-compatible) instead of agent subagents",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/repo-intel",
+        "ref": "main"
+      },
+      "category": "development"
     }
   ]
 }
