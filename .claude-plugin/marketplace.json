@@ -45,6 +45,16 @@
         "ref": "main"
       },
       "category": "development"
+    },
+    {
+      "name": "agents-def",
+      "description": "Role subagents for orchestrated engineering work: explorer, codebase-researcher, architect, implementer, debugger, test-engineer, reviewer, security-reviewer and verifier",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/claude-agents-def",
+        "ref": "main"
+      },
+      "category": "productivity"
     }
   ]
 }
