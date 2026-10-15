@@ -33,9 +33,10 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 | `self-improvement-loop` | Reflect on sessions in the background and promote recurring lessons into skills, hooks, rules and agents, with a local review UI | [kolezka/self-improvement-loop](https://github.com/kolezka/self-improvement-loop) |
 | `outline-persist` | Keep durable work state in Outline: read prior context before work, record task start, checkpoints, handoff and completion | [kolezka/outline-persist](https://github.com/kolezka/outline-persist) |
 | `repo-intel` | Install codegraph and graphify in a repository, route the agent to the right graph, and build the graph on your own LLM backend (LiteLLM, Ollama, OpenAI-compatible) | [kolezka/repo-intel](https://github.com/kolezka/repo-intel) |
+| `kolezka-bootstrap` | Install the owner's global CLAUDE.md, model-pinned route agents and a git push guard. Private: installing needs access to the repository | [kolezka/kolezka-bootstrap](https://github.com/kolezka/kolezka-bootstrap) |
 
-**Plugin access:** This catalog and all listed plugin repositories are public.
-If a plugin repository becomes private, installing it requires Git credentials
+**Plugin access:** This catalog is public. Every listed plugin repository is
+public except `kolezka-bootstrap`. For a private plugin repository, installing it requires Git credentials
 with access to that repository; public access to this marketplace does not grant
 access to a private plugin. Never put credentials in the marketplace manifest.
 
