@@ -12,8 +12,9 @@ In Claude Code:
 /plugin marketplace add kolezka/marketplace
 /plugin install block-docs@kolezka
 /plugin install self-improvement-loop@kolezka
-/plugin install outline-persist@kolezka
+/plugin install worklog-persist@kolezka
 /plugin install repo-intel@kolezka
+/plugin install agents-def@kolezka
 /reload-plugins
 ```
 
@@ -23,7 +24,7 @@ listed plugin. Install the plugins you want individually.
 The marketplace name is `kolezka`, even though the GitHub repository is named
 `marketplace`. Plugin skills keep their own namespace, such as
 `/block-docs:block-docs`, `/self-improvement-loop:reflect` or
-`/outline-persist:outline-persist`.
+`/worklog-persist:worklog-persist`.
 
 ## Plugins
 
@@ -31,9 +32,10 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 |---|---|---|
 | `block-docs` | Create, refresh, and audit system documentation by ownership block | [kolezka/block-docs](https://github.com/kolezka/block-docs) |
 | `self-improvement-loop` | Reflect on sessions in the background and promote recurring lessons into skills, hooks, rules and agents, with a local review UI | [kolezka/self-improvement-loop](https://github.com/kolezka/self-improvement-loop) |
-| `outline-persist` | Keep durable work state in Outline: read prior context before work, record task start, checkpoints, handoff and completion | [kolezka/outline-persist](https://github.com/kolezka/outline-persist) |
+| `worklog-persist` | Keep durable work state in Outline: read prior context before work, record task start, checkpoints, handoff and completion | [kolezka/worklog-persist](https://github.com/kolezka/worklog-persist) |
 | `repo-intel` | Install codegraph and graphify in a repository, route the agent to the right graph, and build the graph on your own LLM backend (LiteLLM, Ollama, OpenAI-compatible) | [kolezka/repo-intel](https://github.com/kolezka/repo-intel) |
-| `kolezka-bootstrap` | Install the owner's global CLAUDE.md, model-pinned route agents and a git push guard. Private: installing needs access to the repository | [kolezka/kolezka-bootstrap](https://github.com/kolezka/kolezka-bootstrap) |
+| `agents-def` | Role subagents for orchestrated engineering work: explorer, codebase-researcher, architect, implementer, debugger, test-engineer, reviewer, security-reviewer and verifier | [kolezka/claude-agents-def](https://github.com/kolezka/claude-agents-def) |
+| `kolezka-bootstrap` | Install the owner's global CLAUDE.md, model-pinned route agents, a git push guard and an off-topic-teammate skill. Private: installing needs access to the repository | [kolezka/kolezka-bootstrap](https://github.com/kolezka/kolezka-bootstrap) |
 
 **Plugin access:** This catalog is public. Every listed plugin repository is
 public except `kolezka-bootstrap`. For a private plugin repository, installing it requires Git credentials
@@ -87,20 +89,20 @@ If you installed it from a local dev marketplace, remove that first:
 /reload-plugins
 ```
 
-## Use outline-persist
+## Use worklog-persist
 
 The plugin needs an `outline` MCP server reachable from the session, plus
 `python3` for redaction. After installing, start a task record and checkpoint it
 as work proceeds:
 
 ```text
-/outline-persist:start <task description>
-/outline-persist:checkpoint <what is verified now>
-/outline-persist:complete
+/worklog-persist:start <task description>
+/worklog-persist:checkpoint <what is verified now>
+/worklog-persist:complete
 ```
 
-`/outline-persist:load` reads prior context, `/outline-persist:handoff` writes a
-handoff record, and `/outline-persist:off` disables the SessionStart hook without
+`/worklog-persist:load` reads prior context, `/worklog-persist:handoff` writes a
+handoff record, and `/worklog-persist:off` disables the SessionStart hook without
 uninstalling. See the plugin's README for the full lifecycle and the redaction
 rules.
 
@@ -113,6 +115,13 @@ first graph. Rebuild later with `/repo-intel:build` or `repo-intel build`.
 `repo-intel migrate-hooks` lists older global graphify and codegraph hooks that
 the plugin replaces. See the plugin's README for backends and hook behaviour.
 
+## Use agents-def
+
+The agents are namespaced, so dispatch them as `agents-def:explorer`,
+`agents-def:reviewer` and so on. `/agents-def:orchestrator` splits a task across
+them. `extras/general-purpose.md` is opt-in; see the plugin's README for how to
+link it.
+
 ## Update
 
 From a terminal, refresh the catalog and then the installed plugin:
@@ -121,8 +130,9 @@ From a terminal, refresh the catalog and then the installed plugin:
 claude plugin marketplace update kolezka
 claude plugin update block-docs@kolezka
 claude plugin update self-improvement-loop@kolezka
-claude plugin update outline-persist@kolezka
+claude plugin update worklog-persist@kolezka
 claude plugin update repo-intel@kolezka
+claude plugin update agents-def@kolezka
 ```
 
 Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.
