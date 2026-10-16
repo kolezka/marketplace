@@ -58,7 +58,7 @@
     },
     {
       "name": "kolezka-bootstrap",
-      "description": "Personal Claude Code setup not shipped by the other kolezka plugins: global CLAUDE.md installer, model-pinned route agents and a git push guard. Private repository",
+      "description": "Personal Claude Code setup not shipped by the other kolezka plugins: global CLAUDE.md installer, model-pinned route agents, a git push guard and an off-topic-teammate skill. Private repository",
       "source": {
         "source": "github",
         "repo": "kolezka/kolezka-bootstrap",
