@@ -15,6 +15,7 @@ In Claude Code:
 /plugin install worklog-persist@kolezka
 /plugin install repo-intel@kolezka
 /plugin install agents-def@kolezka
+/plugin install performance-analyzer@kolezka
 /reload-plugins
 ```
 
@@ -36,6 +37,7 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 | `repo-intel` | Install codegraph and graphify in a repository, route the agent to the right graph, and build the graph on your own LLM backend (LiteLLM, Ollama, OpenAI-compatible) | [kolezka/repo-intel](https://github.com/kolezka/repo-intel) |
 | `agents-def` | Role subagents for orchestrated engineering work: explorer, codebase-researcher, architect, implementer, debugger, test-engineer, reviewer, security-reviewer and verifier | [kolezka/claude-agents-def](https://github.com/kolezka/claude-agents-def) |
 | `kolezka-bootstrap` | Install the owner's global CLAUDE.md, model-pinned route agents, a git push guard and an off-topic-teammate skill. Private: installing needs access to the repository | [kolezka/kolezka-bootstrap](https://github.com/kolezka/kolezka-bootstrap) |
+| `performance-analyzer` | Let a coding agent ask what its harness costs: hook time, text hooks inject into context, and Hindsight memory's share, with the owner of each cost | [kolezka/claude-performance-analyzer](https://github.com/kolezka/claude-performance-analyzer) |
 
 **Plugin access:** This catalog is public. Every listed plugin repository is
 public except `kolezka-bootstrap`. For a private plugin repository, installing it requires Git credentials
@@ -122,6 +124,15 @@ The agents are namespaced, so dispatch them as `agents-def:explorer`,
 them. `extras/general-purpose.md` is opt-in; see the plugin's README for how to
 link it.
 
+## Use performance-analyzer
+
+Needs `bun` on `PATH`. In a new session, ask the agent what its harness costs;
+it starts with the `harness_summary` tool. Every tool covers the calling session
+by default, or recent sessions with `session: "all"` and `since: "7d"`. Hook time
+needs the Claude Performance Analyzer collector running; without it, the answers
+about injected text and Hindsight memory still work. The plugin installs from
+the repository's `release` branch, which carries the built server.
+
 ## Update
 
 From a terminal, refresh the catalog and then the installed plugin:
@@ -133,6 +144,7 @@ claude plugin update self-improvement-loop@kolezka
 claude plugin update worklog-persist@kolezka
 claude plugin update repo-intel@kolezka
 claude plugin update agents-def@kolezka
+claude plugin update performance-analyzer@kolezka
 ```
 
 Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.

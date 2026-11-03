@@ -65,6 +65,16 @@
         "ref": "main"
       },
       "category": "productivity"
+    },
+    {
+      "name": "performance-analyzer",
+      "description": "Lets a coding agent ask what its Claude Code harness costs: hook time, text hooks inject into context, and Hindsight memory's share, with the plugin or settings file behind each cost. Read-only MCP server; needs Bun",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/claude-performance-analyzer",
+        "ref": "release"
+      },
+      "category": "development"
     }
   ]
 }
