@@ -75,6 +75,16 @@
         "ref": "release"
       },
       "category": "development"
+    },
+    {
+      "name": "phased-delivery",
+      "description": "Run a long code change as phases from one session: one worker in a git worktree does one phase at a time, a fresh reviewer checks each phase, and the main session verifies and asks you before the next phase. Private repository",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/phased-delivery",
+        "ref": "main"
+      },
+      "category": "development"
     }
   ]
 }
