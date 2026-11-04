@@ -85,6 +85,16 @@
         "ref": "main"
       },
       "category": "development"
+    },
+    {
+      "name": "agent-fleet",
+      "description": "Supervise several autonomous Claude Code agents in tmux on a local or remote host from one session: watchdog, Monitor, message relay, owner decisions, claim verification and supervisor handoff. Pairs with phased-delivery. Private repository",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/agent-fleet",
+        "ref": "main"
+      },
+      "category": "development"
     }
   ]
 }
