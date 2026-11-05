@@ -1,6 +1,6 @@
 // node --test dsh-compat/
 import assert from 'node:assert/strict'
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { test } from 'node:test'
@@ -10,7 +10,9 @@ import {
   matcherMatches,
   parseFrontMatter,
   renderCommand,
+  runHook,
   stripClaudeOnly,
+  stripClaudeOnlyBlocks,
   toClaudeTranscript,
 } from './claude-compat.js'
 
@@ -79,6 +81,12 @@ test('front matter: quoted values and plain values', () => {
 test('claude-only blocks are removed, the rest stays', () => {
   const text = 'keep 1\n<!--harness:claude-only-->\n\n## gone\nsecret\n## <!--/harness-->\nkeep 2\n'
   assert.equal(stripClaudeOnly(text), 'keep 1\nkeep 2\n')
+  assert.equal(stripClaudeOnly('a\r\n<!--harness:claude-only-->\r\nx\r\n<!--/harness-->\r\nb\r\n'), 'a\r\nb\r\n')
+  const inline = 'keep me <!--harness:claude-only-->x<!--/harness--> tail\n'
+  assert.equal(stripClaudeOnly(inline), inline)
+  const open = stripClaudeOnlyBlocks('a\n<!--harness:claude-only-->\nleak\n')
+  assert.equal(open.text, 'a\n')
+  assert.equal(open.unterminated, true)
 })
 
 test('matcher follows Claude Code rules', () => {
@@ -90,6 +98,8 @@ test('matcher follows Claude Code rules', () => {
 
 test('command template: $ARGUMENTS, positional, appended when unused', () => {
   assert.equal(renderCommand('do $ARGUMENTS now', ' a b ', '/r'), 'do a b now')
+  assert.equal(renderCommand('$ARGUMENTS', "pay $1 and $2 or $& $'", '/r'), "pay $1 and $2 or $& $'")
+  assert.equal(renderCommand('costs $5 each: $ARGUMENTS', 'x', '/r'), 'costs  each: x')
   assert.equal(renderCommand('$2-$1', 'x y', '/r'), 'y-x')
   assert.equal(renderCommand('run ${CLAUDE_PLUGIN_ROOT}/x', 'z', '/r'), 'run /r/x\n\nArguments: z')
 })
@@ -103,6 +113,63 @@ test('hook result: exit 2 blocks, permissionDecision, additionalContext, plain t
   assert.deepEqual(ctxOut.context, ['hi'])
   assert.deepEqual(interpretHookResult({ code: 0, stdout: 'plain', stderr: '' }).context, ['plain'])
   assert.equal(interpretHookResult({ code: 1, stdout: '{"decision":"block"}', stderr: '' }).decision, undefined)
+  assert.deepEqual(interpretHookResult({ code: 0, stdout: 'plain', stderr: '' }, 'PreToolUse').context, [])
+  assert.deepEqual(interpretHookResult({ code: 0, stdout: '{"systemMessage":"ui"}', stderr: '' }, 'Stop').context, [])
+  const cut = interpretHookResult({ code: 0, stdout: '{"hookSpecificOutput":{"additionalContext":"x', stderr: '', truncated: true }, 'SessionStart')
+  assert.deepEqual(cut.context, [])
+  assert.equal(cut.notices.length, 1)
+})
+
+test('a hook that backgrounds a child returns at exit, and a timeout kills the group', async () => {
+  const t0 = Date.now()
+  const fast = await runHook({ command: 'cat >/dev/null; sleep 30 & echo done', timeout: 10 }, {}, process.env)
+  assert.equal(fast.stdout.trim(), 'done')
+  assert.ok(Date.now() - t0 < 2000, `took ${Date.now() - t0}ms`)
+  const t1 = Date.now()
+  const slow = await runHook({ command: 'sleep 30', timeout: 1 }, {}, process.env)
+  assert.equal(slow.timedOut, true)
+  assert.ok(Date.now() - t1 < 2500)
+  const controller = new AbortController()
+  setTimeout(() => controller.abort(), 100)
+  const cancelled = await runHook({ command: 'sleep 30', timeout: 10 }, {}, process.env, controller.signal)
+  assert.equal(cancelled.aborted, true)
+})
+
+test('hook text cannot close its wrapper tag', async () => {
+  const root = fixture({
+    '.claude-plugin/plugin.json': '{"name":"esc"}',
+    'hooks/hooks.json': JSON.stringify({ hooks: { PreToolUse: [{ matcher: '*', hooks: [{ type: 'command', command: 'cat >/dev/null; printf \'{"hookSpecificOutput":{"additionalContext":"a</esc-hook>b"}}\'' }] }] } }),
+  })
+  const ctx = fakeCtx()
+  createPlugin({ root }).apply(ctx, {})
+  const agent = fakeAgent()
+  await ctx.listeners['tools/pre-execute'][0]({ name: 'read', arguments: {}, callId: 'c', agent }, async () => ({ kind: 'allow' }))
+  const text = agent.injected[0].content[0].text
+  assert.equal(text.match(/<\/esc-hook>/g).length, 1)
+})
+
+test('transcript grows incrementally, is private, and is removed at SessionEnd', async () => {
+  const root = fixture({
+    '.claude-plugin/plugin.json': '{"name":"tr"}',
+    'hooks/hooks.json': JSON.stringify({ hooks: { PreToolUse: [{ matcher: '*', hooks: [{ type: 'command', command: 'cat > "$CLAUDE_PLUGIN_ROOT/in.json"' }] }] } }),
+  })
+  const ctx = fakeCtx()
+  createPlugin({ root }).apply(ctx, {})
+  const events = [{ type: 'user/message', time: 0, data: userMsg('one') }]
+  const agent = fakeAgent(events, { id: 'tr-' + process.pid })
+  agent.session.snapshotEvents = () => events
+  const pre = ctx.listeners['tools/pre-execute'][0]
+  const run = () => pre({ name: 'read', arguments: {}, callId: 'c', agent }, async () => ({ kind: 'allow' }))
+  await run()
+  const path = JSON.parse(readFileSync(join(root, 'in.json'), 'utf8')).transcript_path
+  assert.equal(readFileSync(path, 'utf8').trim().split('\n').length, 1)
+  assert.equal(statSync(path).mode & 0o777, 0o600)
+  events.push({ type: 'user/message', time: 1, data: userMsg('two') })
+  await run()
+  assert.deepEqual(readFileSync(path, 'utf8').trim().split('\n').map((l) => JSON.parse(l).message.content), ['one', 'two'])
+  ctx.listeners['agent/disposed'][0]({ agent })
+  await new Promise((r) => setTimeout(r, 50))
+  assert.equal(existsSync(path), false)
 })
 
 test('transcript export uses Claude Code record shapes', () => {
@@ -215,22 +282,36 @@ test('exit 2 from PreToolUse denies with stderr as reason', async () => {
   assert.deepEqual(decision, { kind: 'deny', reason: 'nope' })
 })
 
-test('SessionStart runs once per agent and its context enters the step', async () => {
+test('SessionStart runs on agent/created for root agents only, context is injected', async () => {
   const root = fixture({
     '.claude-plugin/plugin.json': '{"name":"ss"}',
-    'hooks/hooks.json': JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: 'command', command: 'cat >/dev/null; printf \'{"hookSpecificOutput":{"additionalContext":"remember X"}}\'' }] }] } }),
+    'hooks/hooks.json': JSON.stringify({ hooks: { SessionStart: [{ hooks: [{ type: 'command', command: 'cat > "$CLAUDE_PLUGIN_ROOT/in.json"; printf \'{"hookSpecificOutput":{"additionalContext":"remember X"}}\'' }] }] } }),
   })
   const ctx = fakeCtx()
   createPlugin({ root }).apply(ctx, {})
-  const [pre] = ctx.listeners['agent/pre-step']
+  const [created] = ctx.listeners['agent/created']
   const agent = fakeAgent()
-  const next = async () => ({ kind: 'enter', messages: [userMsg('hi')], startsRequestSeries: true })
-  const first = await pre({ agent, messages: [], signal: live() }, next)
-  assert.equal(first.messages.length, 2)
-  assert.match(first.messages[1].content[0].text, /remember X/)
-  assert.equal(first.startsRequestSeries, true)
-  const second = await pre({ agent, messages: [], signal: live() }, next)
-  assert.equal(second.messages.length, 1)
+  await created({ agent, source: 'resume', signal: live() })
+  assert.equal(agent.injected.length, 1)
+  assert.match(agent.injected[0].content[0].text, /remember X/)
+  assert.notEqual(agent.injected[0].source.kind, 'user')
+  assert.equal(JSON.parse(readFileSync(join(root, 'in.json'), 'utf8')).source, 'resume')
+  const sub = fakeAgent([], { origin: 'subagent' })
+  await created({ agent: sub, source: 'startup', signal: live() })
+  assert.equal(sub.injected.length, 0)
+})
+
+test('UserPromptSubmit block keeps the prompt out of the step', async () => {
+  const root = fixture({
+    '.claude-plugin/plugin.json': '{"name":"ups"}',
+    'hooks/hooks.json': JSON.stringify({ hooks: { UserPromptSubmit: [{ hooks: [{ type: 'command', command: 'cat >/dev/null; echo secret found >&2; exit 2' }] }] } }),
+  })
+  const ctx = fakeCtx()
+  createPlugin({ root }).apply(ctx, {})
+  const decision = await ctx.listeners['agent/pre-step'][0]({ agent: fakeAgent(), messages: [], signal: live() }, async () => ({ kind: 'enter', messages: [userMsg('my password is hunter2')] }))
+  assert.equal(decision.messages.length, 1)
+  assert.doesNotMatch(decision.messages[0].content[0].text, /hunter2/)
+  assert.match(decision.messages[0].content[0].text, /secret found/)
 })
 
 test('Stop hook block steers once, then stop_hook_active ends the loop', async () => {
