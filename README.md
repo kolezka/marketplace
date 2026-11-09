@@ -40,7 +40,7 @@ namespace, for example `/block-docs:block-docs`.
 | [repo-intel](#repo-intel) | Find code relationships and architecture context with codegraph and graphify. | Public |
 | [block-docs](#block-docs) | Create, refresh or audit system documentation with source-backed contracts. | Public |
 | [docify](#docify) | Search prepared library documentation through MCP with cited, token-bounded excerpts. | Private |
-| [crawl4ai](#crawl4ai) | Search the web and read rendered pages through your own SearXNG and Crawl4AI services. | Private |
+| [stealth-search](#stealth-search) | Search the web and read rendered pages through your own SearXNG and Crawl4AI services. | Private |
 | [design-studio](#design-studio) | Compare UI directions as HTML drafts on a local canvas before changing product code. | Private |
 | [performance-analyzer](#performance-analyzer) | Find which hooks, injected text and memory add cost to your sessions. | Public |
 
@@ -152,7 +152,7 @@ prepared documentation sources.
 
 </details>
 
-### crawl4ai
+### stealth-search
 
 Use self-hosted SearXNG for discovery and Crawl4AI for rendered page content.
 The plugin provides search, fetch, research and bounded crawling through a local
@@ -162,7 +162,7 @@ CLI, without an MCP server.
 <summary>Install and research the web (private)</summary>
 
 ```text
-/plugin install crawl4ai@kolezka
+/plugin install stealth-search@kolezka
 ```
 
 Before starting a new Claude Code session, export `SEARXNG_URL`, `CRAWL4AI_URL`
@@ -174,7 +174,7 @@ variables. The plugin does not deploy either service.
 Then invoke the namespaced skill:
 
 ```text
-/crawl4ai:crawl Find Apple's recommendations for navigation and cite the source pages.
+/stealth-search:crawl Find Apple's recommendations for navigation and cite the source pages.
 ```
 
 **Routing changes:** While enabled, hooks block the built-in `WebSearch` and
@@ -188,7 +188,7 @@ Claude Code 2.1.319+, reachable SearXNG with JSON search enabled, and a Crawl4AI
 0.9.5-compatible `/crawl` API with its service token. Model analysis still uses
 your Claude Code provider; SearXNG queries its configured upstream engines.
 
-[Source and service configuration](https://github.com/kolezka/claude-crawler4ai-plugin#readme)
+[Source and service configuration](https://github.com/kolezka/claude-stealth-search-plugin#readme)
 
 </details>
 
