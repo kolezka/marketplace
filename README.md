@@ -1,70 +1,417 @@
-# kolezka plugin marketplace
+<h1 align="center">kolezka plugins</h1>
 
-A public catalog of Claude Code plugins maintained by [kolezka](https://github.com/kolezka).
-Each plugin is maintained in its own repository. This repository contains only the
-marketplace manifest and installation instructions; it does not run a service.
+<p align="center">
+  <strong>A toolkit for Claude Code, from the first code search to a fleet of agents.</strong><br>
+  Understand a codebase, keep context between sessions, learn from mistakes and coordinate longer work.
+</p>
 
-## Install
+<p align="center">
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#plugin-catalog">Plugin catalog</a> ·
+  <a href="#usage-guides">Usage guides</a> ·
+  <a href="#updates-and-migration">Updates</a> ·
+  <a href="#add-a-plugin">Contribute</a>
+</p>
 
-In Claude Code:
+---
+
+## Quick start
+
+Add the marketplace, then install a plugin you want to use. In Claude Code:
 
 ```text
 /plugin marketplace add kolezka/marketplace
 /plugin install block-docs@kolezka
-/plugin install self-improvement-loop@kolezka
-/plugin install worklog-persist@kolezka
-/plugin install repo-intel@kolezka
-/plugin install agents-def@kolezka
-/plugin install performance-analyzer@kolezka
-/plugin install docify@kolezka
 /reload-plugins
 ```
 
-Adding the marketplace makes its catalog available. It does not install every
-listed plugin. Install the plugins you want individually.
+Replace `block-docs` with any name from the catalog below. Adding the marketplace
+makes the catalog available; it does **not** install all plugins.
 
-The marketplace name is `kolezka`, even though the GitHub repository is named
-`marketplace`. Plugin skills keep their own namespace, such as
-`/block-docs:block-docs`, `/self-improvement-loop:reflect` or
-`/worklog-persist:worklog-persist`.
+The marketplace is named **`kolezka`**, not `marketplace`. Skills use the plugin's
+namespace, for example `/block-docs:block-docs`.
 
-## Plugins
+## Plugin catalog
 
-| Plugin | Purpose | Source |
-|---|---|---|
-| `block-docs` | Create, refresh, and audit system documentation by ownership block | [kolezka/block-docs](https://github.com/kolezka/block-docs) |
-| `self-improvement-loop` | Reflect on sessions in the background and promote recurring lessons into skills, hooks, rules and agents, with a local review UI | [kolezka/self-improvement-loop](https://github.com/kolezka/self-improvement-loop) |
-| `worklog-persist` | Keep durable work state in Outline: read prior context before work, record task start, checkpoints, handoff and completion | [kolezka/worklog-persist](https://github.com/kolezka/worklog-persist) |
-| `repo-intel` | Install codegraph and graphify in a repository, route the agent to the right graph, and build the graph on your own LLM backend (LiteLLM, Ollama, OpenAI-compatible) | [kolezka/repo-intel](https://github.com/kolezka/repo-intel) |
-| `agents-def` | Role subagents for orchestrated engineering work: explorer, codebase-researcher, architect, implementer, debugger, test-engineer, reviewer, security-reviewer and verifier | [kolezka/claude-agents-def](https://github.com/kolezka/claude-agents-def) |
-| `kolezka-bootstrap` | Install the owner's global CLAUDE.md, model-pinned route agents, a git push guard and an off-topic-teammate skill. Private: installing needs access to the repository | [kolezka/kolezka-bootstrap](https://github.com/kolezka/kolezka-bootstrap) |
-| `performance-analyzer` | Let a coding agent ask what its harness costs: hook time, text hooks inject into context, and Hindsight memory's share, with the owner of each cost | [kolezka/claude-performance-analyzer](https://github.com/kolezka/claude-performance-analyzer) |
-| `phased-delivery` | Run a long code change as phases: one worker in a git worktree, one phase at a time, a fresh reviewer per phase and a check with you before the next phase. Private: installing needs access to the repository | [kolezka/phased-delivery](https://github.com/kolezka/phased-delivery) |
-| `agent-fleet` | Supervise several autonomous Claude Code agents in tmux from one session: watchdog, Monitor, message relay, owner decisions and supervisor handoff. Private: installing needs access to the repository | [kolezka/agent-fleet](https://github.com/kolezka/agent-fleet) |
-| `design-studio` | Design and redesign UI as HTML drafts drawn by the current model, checked against real renders and compared side by side on a local canvas, without a design service. Private: installing needs access to the repository | [kolezka/design-studio](https://github.com/kolezka/design-studio) |
-| `docify` | Search locally prepared documentation through MCP with cited, token-bounded excerpts and a Docify skill. Private: installing needs access to the repository | [kolezka/docify](https://github.com/kolezka/docify/tree/main/integrations/claude-code/docify) |
+### Understand, design and document
 
-**Plugin access:** This catalog is public. Every listed plugin repository is
-public except `kolezka-bootstrap`, `phased-delivery`, `agent-fleet`, `design-studio` and `docify`. For a private plugin repository, installing it requires Git credentials
-with access to that repository; public access to this marketplace does not grant
-access to a private plugin. Never put credentials in the marketplace manifest.
+| Plugin | When to use it | Access |
+| --- | --- | --- |
+| [repo-intel](#repo-intel) | Find code relationships and architecture context with codegraph and graphify. | Public |
+| [block-docs](#block-docs) | Create, refresh or audit system documentation with source-backed contracts. | Public |
+| [docify](#docify) | Search prepared library documentation through MCP with cited, token-bounded excerpts. | Private |
+| [design-studio](#design-studio) | Compare UI directions as HTML drafts on a local canvas before changing product code. | Private |
+| [performance-analyzer](#performance-analyzer) | Find which hooks, injected text and memory add cost to your sessions. | Public |
 
-## Use block-docs
+### Remember and improve
 
-Open Claude Code in the repository you want to document, then run:
+| Plugin | When to use it | Access |
+| --- | --- | --- |
+| [worklog-persist](#worklog-persist) | Carry task state, decisions and verified checkpoints across sessions in Outline. | Public |
+| [self-improvement-loop](#self-improvement-loop) | Turn recurring session mistakes into proposed skills, hooks, rules and agents. | Public |
+| [kolezka-bootstrap](#kolezka-bootstrap) | Install the maintainer's personal instructions, model routing and push guard. | Private |
+
+### Delegate and deliver
+
+| Plugin | When to use it | Access |
+| --- | --- | --- |
+| [agents-def](#agents-def) | Delegate bounded engineering tasks to role-specific subagents. | Public |
+| [phased-delivery](#phased-delivery) | Run a long change one phase at a time, with review and verification between phases. | Private |
+| [agent-fleet](#agent-fleet) | Supervise parallel agents in tmux on a local or remote host. | Private |
+
+> **Private plugins need repository access.** This catalog is public, but it does
+> not grant access to private source repositories. Use Git credentials with read
+> access; never put credentials in the marketplace manifest.
+
+## Usage guides
+
+Choose a plugin below for installation, a first action and its requirements.
+Each plugin lives in its own repository; follow its linked documentation for the
+full setup and workflow.
+
+### repo-intel
+
+Install codegraph and graphify, keep their graphs fresh, and route the agent to
+code structure or semantic context instead of starting each search from scratch.
+Graphify's extraction can use a model backend you choose.
+
+<details>
+<summary>Install and index a repository</summary>
 
 ```text
-/block-docs:block-docs Create documentation for this repository under docs/.
-Read the source at HEAD, identify ownership boundaries, and document each block.
+/plugin install repo-intel@kolezka
+/reload-plugins
+/repo-intel:setup
+```
+
+Run setup in the repository you want indexed. It handles tool installation after
+asking, backend configuration and the first build. Rebuild later with
+`/repo-intel:build` or `repo-intel build`.
+
+**Needs:** Git and `jq`; `uv` or `pipx`, plus `pnpm` or `npm`, for tool installation.
+`repo-intel migrate-hooks` lists older global graph hooks the plugin replaces.
+
+[Source and backend options](https://github.com/kolezka/repo-intel#readme)
+
+</details>
+
+### block-docs
+
+Document a system one ownership block at a time. Writer and verifier agents work
+with contracts, invariants, known gaps and claims pinned to a source revision.
+
+<details>
+<summary>Install and document a codebase</summary>
+
+```text
+/plugin install block-docs@kolezka
+/reload-plugins
+/block-docs:block-docs Document this repository under docs/.
+Read the source at HEAD, identify ownership boundaries and document each block.
 Do not commit or push.
 ```
 
-See the plugin's README for its requirements and full workflow. The plugin owns
-its agent, skill, templates, and validation tools; this marketplace does not copy
-or modify those components.
+It also supports refreshing existing documentation, auditing claims, and writing
+from a committed design spec before implementation exists.
 
-If you already installed the same plugin from its standalone marketplace,
-remove that installation before switching to this catalog:
+**Needs:** Python 3.9+ for structural linting, plus Git and the referenced commits
+for revision validation.
+
+[Source and documentation workflow](https://github.com/kolezka/block-docs#readme)
+
+</details>
+
+### docify
+
+Search locally prepared library documentation through MCP. The Docify skill uses
+`docs_sources`, `docs_search` and `docs_read` for cited, token-bounded excerpts.
+
+<details>
+<summary>Install and search prepared documentation (private)</summary>
+
+```text
+/plugin install docify@kolezka
+/reload-plugins
+/docify:docify Search the prepared Bun documentation for SQLite transactions.
+```
+
+Install the [Docify CLI](https://github.com/kolezka/docify) separately and put
+`docify` on `PATH` before starting Claude Code. Prepare documentation with the CLI
+or web UI first. The plugin starts `docify mcp`; it does not install the CLI,
+download documentation or prepare embedding models.
+
+The catalog installs the plugin from `integrations/claude-code/docify` in the
+source repository. If `docify@docify-local` is already installed, uninstall that
+copy before switching to `docify@kolezka` to avoid loading it twice.
+
+**Needs:** Read access to the private repository, the Docify CLI on `PATH` and
+prepared documentation sources.
+
+[Source and plugin integration](https://github.com/kolezka/docify/tree/main/integrations/claude-code/docify)
+
+</details>
+
+### design-studio
+
+Explore UI directions before changing product code. The model creates a baseline
+and alternative HTML drafts, checks renders in light and dark, and compares them
+side by side on a local canvas. No separate design service is needed.
+
+<details>
+<summary>Install and compare design directions (private)</summary>
+
+```text
+/plugin install design-studio@kolezka
+/reload-plugins
+```
+
+Start a new session and ask:
+
+```text
+Use design-studio: the settings page looks dated. Show me two directions before
+we change any product code.
+```
+
+Drafts, screenshots and the selected design system live under `.design/` in the
+project. Give feedback in chat, pick a direction, then ask to implement it when
+ready. The canvas is for comparing drafts, not editing them.
+
+**Needs:** Read access to the private repository, Bun and Chrome, Chromium, Edge
+or Brave. Set `CHROME_PATH` for another browser path. Rendering needs network
+access to load Tailwind from jsDelivr.
+
+[Source, canvas and rendering tools](https://github.com/kolezka/design-studio#readme)
+
+</details>
+
+### performance-analyzer
+
+Give the agent a read-only view of what its harness costs: hook time, injected
+context and Hindsight memory, with the plugin or settings file behind each cost.
+
+<details>
+<summary>Install and inspect session overhead</summary>
+
+```text
+/plugin install performance-analyzer@kolezka
+/reload-plugins
+```
+
+Start a new session and ask:
+
+```text
+Which hooks slow down my prompts, and how much context do they inject?
+```
+
+The agent starts with `harness_summary`, then uses the focused tools as needed.
+
+**Needs:** Bun on `PATH`. Hook timing needs the Claude Performance Analyzer app
+and its telemetry collector. Without the app, injected-text analysis still works.
+The catalog uses the `release` branch with the built MCP server.
+
+[Source and MCP setup](https://github.com/kolezka/claude-performance-analyzer#let-your-agent-check-its-setup-mcp)
+
+</details>
+
+### worklog-persist
+
+Keep a durable task record in Outline: what is in progress, what was verified,
+which decisions were made, what is blocked and what comes next.
+
+<details>
+<summary>Install and keep a task record</summary>
+
+```text
+/plugin install worklog-persist@kolezka
+/reload-plugins
+/worklog-persist:load
+/worklog-persist:start <task description>
+/worklog-persist:checkpoint <what is verified now>
+/worklog-persist:complete
+```
+
+Use `/worklog-persist:handoff` before transferring work to another session.
+`/worklog-persist:off` disables automatic persistence without uninstalling.
+
+**Needs:** A reachable `outline` MCP server configured through environment
+variables, plus Python 3 for redaction and PyYAML for the routing config.
+
+[Source and Outline configuration](https://github.com/kolezka/worklog-persist#readme)
+
+</details>
+
+### self-improvement-loop
+
+Review coding sessions in the background, find recurring lessons and draft
+changes to skills, hooks, rules and agents. Inspect proposals in the local review
+console, then keep or reject them.
+
+<details>
+<summary>Install and start the learning loop</summary>
+
+```text
+/plugin install self-improvement-loop@kolezka
+/reload-plugins
+/self-improvement-loop:loop
+/self-improvement-loop:loop web
+```
+
+The first run creates config, a local `learned/` repository and `~/.local/bin/sil`.
+The default model provider is your Claude CLI. Use namespaced commands to avoid
+collisions with other plugins:
+
+```text
+/self-improvement-loop:reflect
+/self-improvement-loop:feedback skill:<name> good
+```
+
+**Needs:** Bun 1.4.2+, Git and a working Claude Code CLI. Background reviews use
+your model provider's quota or billing; transcript-derived content goes to that
+provider. Put `~/.local/bin` on `PATH` for the terminal CLI.
+
+[Source](https://github.com/kolezka/self-improvement-loop#readme) ·
+[Install, scheduling and model providers](https://github.com/kolezka/self-improvement-loop/blob/release/docs/INSTALL.md)
+
+</details>
+
+### kolezka-bootstrap
+
+The maintainer's personal setup, not a general-purpose prerequisite for this
+catalog. It adds global `CLAUDE.md` instructions, model-pinned route agents, a
+Git push guard and an off-topic teammate skill.
+
+<details>
+<summary>Install and preview the personal setup (private)</summary>
+
+```text
+/plugin install kolezka-bootstrap@kolezka
+/reload-plugins
+/kolezka-bootstrap:install --check
+```
+
+Read the preview before applying it with `/kolezka-bootstrap:install`. The
+installer links the plugin's instructions into your config and preserves existing
+content. `--migrate` also retires older local route agents and the inline push
+hook; it is a separate, optional migration.
+
+**Needs:** Read access to the private repository, `jq` and the Claude CLI. Review
+the instructions and model routing before adopting this personal configuration.
+
+[Source and installer modes](https://github.com/kolezka/kolezka-bootstrap#readme)
+
+</details>
+
+### agents-def
+
+Role-specific subagents for exploration, codebase research, architecture,
+implementation, debugging, tests, code review, security review and verification.
+The orchestrator skill coordinates their work.
+
+<details>
+<summary>Install and delegate a task</summary>
+
+```text
+/plugin install agents-def@kolezka
+/reload-plugins
+/agents-def:orchestrator Implement the agreed change, delegate focused tasks and verify the result.
+```
+
+Agent types are namespaced, for example `agents-def:explorer` and
+`agents-def:reviewer`. Remove old user-level copies when migrating so each role
+does not appear twice. The `extras/general-purpose.md` override is opt-in and
+needs a separate link; it is not installed as a plugin agent.
+
+**Needs:** Claude Code subagent support. Read-only roles are prompt contracts,
+not an operating-system sandbox.
+
+[Source and agent roles](https://github.com/kolezka/claude-agents-def#readme)
+
+</details>
+
+### phased-delivery
+
+Run a long change through one persistent worker in an isolated git worktree.
+A fresh reviewer checks each phase; the main session verifies results and checks
+with you before starting the next phase.
+
+<details>
+<summary>Install and start a phased change (private)</summary>
+
+```text
+/plugin install phased-delivery@kolezka
+/reload-plugins
+```
+
+Then describe the work:
+
+```text
+Use phased-delivery: port the settings screen to the new design system in 4 phases.
+```
+
+Run state and reports stay in the worktree's Git directory. A new session can
+resume from that state; the plugin does not keep running after the session ends.
+An optional `.claude/phased-delivery.md` profile records repository-specific test
+commands and rules.
+
+**Needs:** Read access to the private repository, Git worktrees and Claude Code
+worker/reviewer agents. It does not push or open PRs unless asked.
+
+[Source, resume and workflow modes](https://github.com/kolezka/phased-delivery#readme)
+
+</details>
+
+### agent-fleet
+
+Supervise several autonomous Claude Code agents, one per platform, area or ticket,
+from one session. Includes a watchdog, message relay, owner decisions and
+supervisor handoff. Pair it with phased-delivery inside each agent.
+
+<details>
+<summary>Install and prepare a fleet (private)</summary>
+
+```text
+/plugin install agent-fleet@kolezka
+/reload-plugins
+```
+
+Then ask the supervisor:
+
+```text
+Use agent-fleet to prepare parallel agents for this project. Review the prompts,
+autonomy limits and host configuration with me before starting them.
+```
+
+The supervisor uses the fleet CLI and skill. Install `phased-delivery` in the
+agents' Claude config on the host. Configure `fleet.conf`, prompts and hard limits,
+then sync and dry-run the watchdog before starting. Trust the agent working
+directory manually once on the host.
+
+**Needs:** Read access to the private repository. Agent host: Linux or macOS,
+Bash 4+, tmux, ripgrep and Claude Code. A remote supervisor also needs key-based
+SSH access. Local-only fleets do not need a separate host.
+
+[Source, host setup and fleet CLI](https://github.com/kolezka/agent-fleet#readme)
+
+</details>
+
+## Updates and migration
+
+From a terminal, refresh the catalog and update an installed plugin:
+
+```sh
+claude plugin marketplace update kolezka
+claude plugin update block-docs@kolezka
+```
+
+Replace `block-docs` with the plugin you want to update. Run `/reload-plugins` in
+active sessions; follow a plugin's setup guide if it requires a new session.
+Releases and versions belong to the source repositories.
+
+<details>
+<summary>Switch from a standalone or development marketplace</summary>
+
+Remove the old installation before installing the same plugin from this catalog.
+For example:
 
 ```text
 /plugin uninstall block-docs@block-docs
@@ -72,113 +419,14 @@ remove that installation before switching to this catalog:
 /reload-plugins
 ```
 
-## Use self-improvement-loop
+For a development marketplace, use its actual name in the uninstall command.
 
-The plugin needs `bun` (1.4.2 or newer) and `git` on `PATH`, plus a model
-endpoint. After installing, run the first-time setup from a terminal:
-
-```sh
-sil init
-sil web
-```
-
-`sil init` writes the config templates; edit `llm.yaml` to set the three model
-roles before the worker can call a model. In any Claude Code session, `/loop`
-shows status, `/reflect` queues a background reflection on the work just done,
-and `/feedback <type>:<name> good|bad` rates an artifact. See the plugin's
-`docs/INSTALL.md` for scheduling the worker and the web UI.
-
-If you installed it from a local dev marketplace, remove that first:
-
-```text
-/plugin uninstall self-improvement-loop@<dev-marketplace-name>
-/plugin install self-improvement-loop@kolezka
-/reload-plugins
-```
-
-## Use worklog-persist
-
-The plugin needs an `outline` MCP server reachable from the session, plus
-`python3` for redaction. After installing, start a task record and checkpoint it
-as work proceeds:
-
-```text
-/worklog-persist:start <task description>
-/worklog-persist:checkpoint <what is verified now>
-/worklog-persist:complete
-```
-
-`/worklog-persist:load` reads prior context, `/worklog-persist:handoff` writes a
-handoff record, and `/worklog-persist:off` disables the SessionStart hook without
-uninstalling. See the plugin's README for the full lifecycle and the redaction
-rules.
-
-## Use repo-intel
-
-Needs `git` and `jq`. In the repository you want indexed, run
-`/repo-intel:setup`. It installs missing tools after asking, sets the LLM
-backend for graphify's semantic extraction, indexes codegraph, and builds the
-first graph. Rebuild later with `/repo-intel:build` or `repo-intel build`.
-`repo-intel migrate-hooks` lists older global graphify and codegraph hooks that
-the plugin replaces. See the plugin's README for backends and hook behaviour.
-
-## Use agents-def
-
-The agents are namespaced, so dispatch them as `agents-def:explorer`,
-`agents-def:reviewer` and so on. `/agents-def:orchestrator` splits a task across
-them. `extras/general-purpose.md` is opt-in; see the plugin's README for how to
-link it.
-
-## Use performance-analyzer
-
-Needs `bun` on `PATH`. In a new session, ask the agent what its harness costs;
-it starts with the `harness_summary` tool. Every tool covers the calling session
-by default, or recent sessions with `session: "all"` and `since: "7d"`. Hook time
-needs the Claude Performance Analyzer collector running; without it, the answers
-about injected text and Hindsight memory still work. The plugin installs from
-the repository's `release` branch, which carries the built server.
-
-## Use Docify
-
-Install the [Docify CLI](https://github.com/kolezka/docify) separately and make
-sure `docify` is on `PATH` before starting Claude Code. Prepare documentation
-with the CLI or web UI first. Installing the plugin does not install the CLI,
-download documentation or prepare embedding models.
-
-The plugin includes `/docify:docify` and starts `docify mcp`, exposing
-`docs_sources`, `docs_search` and `docs_read`. Ask about a registered library or
-invoke the skill directly:
-
-```text
-/docify:docify Search the prepared Bun documentation for SQLite transactions.
-```
-
-The marketplace installs the plugin from `integrations/claude-code/docify` in
-the private `kolezka/docify` repository. Git credentials need access to it.
-If you already installed `docify@docify-local`, uninstall that copy before
-installing `docify@kolezka` to avoid loading the skill and MCP server twice.
-
-## Update
-
-From a terminal, refresh the catalog and then the installed plugin:
-
-```sh
-claude plugin marketplace update kolezka
-claude plugin update block-docs@kolezka
-claude plugin update self-improvement-loop@kolezka
-claude plugin update worklog-persist@kolezka
-claude plugin update repo-intel@kolezka
-claude plugin update agents-def@kolezka
-claude plugin update performance-analyzer@kolezka
-claude plugin update docify@kolezka
-```
-
-Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.
-Plugin releases and version numbers belong to the source plugin repository.
+</details>
 
 ## Add a plugin
 
-Add an entry to the `plugins` array in `.claude-plugin/marketplace.json`:
+This repository holds the catalog and its guide, not copies of plugin code.
+Add an entry to [`plugins` in the manifest](.claude-plugin/marketplace.json):
 
 ```json
 {
@@ -192,21 +440,25 @@ Add an entry to the `plugins` array in `.claude-plugin/marketplace.json`:
 }
 ```
 
-Replace the example name and repository with an actual plugin. The entry name must
-match the plugin's own `.claude-plugin/plugin.json` name. Its repository must
-contain a valid plugin manifest and its advertised components.
+The name must match the source plugin's `.claude-plugin/plugin.json`. Its
+repository must contain that manifest and the advertised components. Set `ref`
+to the intended branch, release ref or commit pin; catalog entries do not all
+follow the same branch.
 
-Validate the catalog before committing:
+**Update this README too:** add the plugin to the catalog and include a usage
+guide with requirements, a first action, access level and a source link.
+
+Validate the manifest:
 
 ```sh
 claude plugin validate .claude-plugin/marketplace.json --strict
 ```
 
-Manifest validation checks catalog structure, not source access or plugin behavior.
-Test installation separately. A catalog entry follows `main`; use an explicit
-release ref or commit pin if you need a fixed source revision.
+Validation checks catalog structure, not repository access or plugin behavior.
+Test installation separately.
 
-## Reference
+---
 
-- [Create plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces)
-- [Discover and install plugins](https://code.claude.com/docs/en/discover-plugins)
+Maintained by [kolezka](https://github.com/kolezka). See the official guides for
+[plugin marketplaces](https://code.claude.com/docs/en/plugin-marketplaces) and
+[discovering and installing plugins](https://code.claude.com/docs/en/discover-plugins).
