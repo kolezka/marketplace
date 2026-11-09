@@ -40,9 +40,10 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 | `performance-analyzer` | Let a coding agent ask what its harness costs: hook time, text hooks inject into context, and Hindsight memory's share, with the owner of each cost | [kolezka/claude-performance-analyzer](https://github.com/kolezka/claude-performance-analyzer) |
 | `phased-delivery` | Run a long code change as phases: one worker in a git worktree, one phase at a time, a fresh reviewer per phase and a check with you before the next phase. Private: installing needs access to the repository | [kolezka/phased-delivery](https://github.com/kolezka/phased-delivery) |
 | `agent-fleet` | Supervise several autonomous Claude Code agents in tmux from one session: watchdog, Monitor, message relay, owner decisions and supervisor handoff. Private: installing needs access to the repository | [kolezka/agent-fleet](https://github.com/kolezka/agent-fleet) |
+| `design-studio` | Design and redesign UI as HTML drafts drawn by the current model, checked against real renders and compared side by side on a local canvas, without a design service. Private: installing needs access to the repository | [kolezka/design-studio](https://github.com/kolezka/design-studio) |
 
 **Plugin access:** This catalog is public. Every listed plugin repository is
-public except `kolezka-bootstrap`, `phased-delivery` and `agent-fleet`. For a private plugin repository, installing it requires Git credentials
+public except `kolezka-bootstrap`, `phased-delivery`, `agent-fleet` and `design-studio`. For a private plugin repository, installing it requires Git credentials
 with access to that repository; public access to this marketplace does not grant
 access to a private plugin. Never put credentials in the marketplace manifest.
 
