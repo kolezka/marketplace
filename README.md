@@ -16,6 +16,7 @@ In Claude Code:
 /plugin install repo-intel@kolezka
 /plugin install agents-def@kolezka
 /plugin install performance-analyzer@kolezka
+/plugin install docify@kolezka
 /reload-plugins
 ```
 
@@ -41,9 +42,10 @@ The marketplace name is `kolezka`, even though the GitHub repository is named
 | `phased-delivery` | Run a long code change as phases: one worker in a git worktree, one phase at a time, a fresh reviewer per phase and a check with you before the next phase. Private: installing needs access to the repository | [kolezka/phased-delivery](https://github.com/kolezka/phased-delivery) |
 | `agent-fleet` | Supervise several autonomous Claude Code agents in tmux from one session: watchdog, Monitor, message relay, owner decisions and supervisor handoff. Private: installing needs access to the repository | [kolezka/agent-fleet](https://github.com/kolezka/agent-fleet) |
 | `design-studio` | Design and redesign UI as HTML drafts drawn by the current model, checked against real renders and compared side by side on a local canvas, without a design service. Private: installing needs access to the repository | [kolezka/design-studio](https://github.com/kolezka/design-studio) |
+| `docify` | Search locally prepared documentation through MCP with cited, token-bounded excerpts and a Docify skill. Private: installing needs access to the repository | [kolezka/docify](https://github.com/kolezka/docify/tree/main/integrations/claude-code/docify) |
 
 **Plugin access:** This catalog is public. Every listed plugin repository is
-public except `kolezka-bootstrap`, `phased-delivery`, `agent-fleet` and `design-studio`. For a private plugin repository, installing it requires Git credentials
+public except `kolezka-bootstrap`, `phased-delivery`, `agent-fleet`, `design-studio` and `docify`. For a private plugin repository, installing it requires Git credentials
 with access to that repository; public access to this marketplace does not grant
 access to a private plugin. Never put credentials in the marketplace manifest.
 
@@ -136,6 +138,26 @@ needs the Claude Performance Analyzer collector running; without it, the answers
 about injected text and Hindsight memory still work. The plugin installs from
 the repository's `release` branch, which carries the built server.
 
+## Use Docify
+
+Install the [Docify CLI](https://github.com/kolezka/docify) separately and make
+sure `docify` is on `PATH` before starting Claude Code. Prepare documentation
+with the CLI or web UI first. Installing the plugin does not install the CLI,
+download documentation or prepare embedding models.
+
+The plugin includes `/docify:docify` and starts `docify mcp`, exposing
+`docs_sources`, `docs_search` and `docs_read`. Ask about a registered library or
+invoke the skill directly:
+
+```text
+/docify:docify Search the prepared Bun documentation for SQLite transactions.
+```
+
+The marketplace installs the plugin from `integrations/claude-code/docify` in
+the private `kolezka/docify` repository. Git credentials need access to it.
+If you already installed `docify@docify-local`, uninstall that copy before
+installing `docify@kolezka` to avoid loading the skill and MCP server twice.
+
 ## Update
 
 From a terminal, refresh the catalog and then the installed plugin:
@@ -148,6 +170,7 @@ claude plugin update worklog-persist@kolezka
 claude plugin update repo-intel@kolezka
 claude plugin update agents-def@kolezka
 claude plugin update performance-analyzer@kolezka
+claude plugin update docify@kolezka
 ```
 
 Run `/reload-plugins` in active Claude Code sessions to apply plugin changes.
