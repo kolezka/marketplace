@@ -105,6 +105,17 @@
         "ref": "main"
       },
       "category": "design"
+    },
+    {
+      "name": "docify",
+      "description": "Search locally prepared documentation through MCP with cited, token-bounded excerpts and a Docify skill. Needs docify on PATH and access to the private repository",
+      "source": {
+        "source": "git-subdir",
+        "url": "kolezka/docify",
+        "path": "integrations/claude-code/docify",
+        "ref": "main"
+      },
+      "category": "documentation"
     }
   ]
 }
