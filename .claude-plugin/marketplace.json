@@ -118,11 +118,11 @@
       "category": "documentation"
     },
     {
-      "name": "crawl4ai",
+      "name": "stealth-search",
       "description": "Web research through self-hosted SearXNG and Crawl4AI without MCP. Routes built-in web search and fetch through a local CLI. Needs Bun, Python 3.10+ and configured services. Private repository",
       "source": {
         "source": "github",
-        "repo": "kolezka/claude-crawler4ai-plugin",
+        "repo": "kolezka/claude-stealth-search-plugin",
         "ref": "main"
       },
       "category": "productivity"
