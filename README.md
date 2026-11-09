@@ -40,6 +40,7 @@ namespace, for example `/block-docs:block-docs`.
 | [repo-intel](#repo-intel) | Find code relationships and architecture context with codegraph and graphify. | Public |
 | [block-docs](#block-docs) | Create, refresh or audit system documentation with source-backed contracts. | Public |
 | [docify](#docify) | Search prepared library documentation through MCP with cited, token-bounded excerpts. | Private |
+| [crawl4ai](#crawl4ai) | Search the web and read rendered pages through your own SearXNG and Crawl4AI services. | Private |
 | [design-studio](#design-studio) | Compare UI directions as HTML drafts on a local canvas before changing product code. | Private |
 | [performance-analyzer](#performance-analyzer) | Find which hooks, injected text and memory add cost to your sessions. | Public |
 
@@ -148,6 +149,46 @@ copy before switching to `docify@kolezka` to avoid loading it twice.
 prepared documentation sources.
 
 [Source and plugin integration](https://github.com/kolezka/docify/tree/main/integrations/claude-code/docify)
+
+</details>
+
+### crawl4ai
+
+Use self-hosted SearXNG for discovery and Crawl4AI for rendered page content.
+The plugin provides search, fetch, research and bounded crawling through a local
+CLI, without an MCP server.
+
+<details>
+<summary>Install and research the web (private)</summary>
+
+```text
+/plugin install crawl4ai@kolezka
+```
+
+Before starting a new Claude Code session, export `SEARXNG_URL`, `CRAWL4AI_URL`
+and `CRAWL4AI_API_TOKEN` in its launching shell. Use your own service addresses
+and follow the source README's hidden token prompt; never commit the token or put
+it in plugin metadata. An existing Claude process will not inherit newly exported
+variables. The plugin does not deploy either service.
+
+Then invoke the namespaced skill:
+
+```text
+/crawl4ai:crawl Find Apple's recommendations for navigation and cite the source pages.
+```
+
+**Routing changes:** While enabled, hooks block the built-in `WebSearch` and
+`WebFetch` tools and direct the agent to the CLI. This can conflict with plugins
+that require another web provider. It is not a network firewall and does not
+block arbitrary shell or MCP requests. Service errors do not silently fall back
+to a public search API.
+
+**Needs:** Read access to the private repository, Bun on `PATH`, Python 3.10+,
+Claude Code 2.1.319+, reachable SearXNG with JSON search enabled, and a Crawl4AI
+0.9.5-compatible `/crawl` API with its service token. Model analysis still uses
+your Claude Code provider; SearXNG queries its configured upstream engines.
+
+[Source and service configuration](https://github.com/kolezka/claude-crawler4ai-plugin#readme)
 
 </details>
 
