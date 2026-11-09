@@ -39,6 +39,7 @@ namespace, for example `/block-docs:block-docs`.
 | --- | --- | --- |
 | [repo-intel](#repo-intel) | Find code relationships and architecture context with codegraph and graphify. | Public |
 | [block-docs](#block-docs) | Create, refresh or audit system documentation with source-backed contracts. | Public |
+| [docify](#docify) | Search prepared library documentation through MCP with cited, token-bounded excerpts. | Private |
 | [design-studio](#design-studio) | Compare UI directions as HTML drafts on a local canvas before changing product code. | Private |
 | [performance-analyzer](#performance-analyzer) | Find which hooks, injected text and memory add cost to your sessions. | Public |
 
@@ -117,6 +118,36 @@ from a committed design spec before implementation exists.
 for revision validation.
 
 [Source and documentation workflow](https://github.com/kolezka/block-docs#readme)
+
+</details>
+
+### docify
+
+Search locally prepared library documentation through MCP. The Docify skill uses
+`docs_sources`, `docs_search` and `docs_read` for cited, token-bounded excerpts.
+
+<details>
+<summary>Install and search prepared documentation (private)</summary>
+
+```text
+/plugin install docify@kolezka
+/reload-plugins
+/docify:docify Search the prepared Bun documentation for SQLite transactions.
+```
+
+Install the [Docify CLI](https://github.com/kolezka/docify) separately and put
+`docify` on `PATH` before starting Claude Code. Prepare documentation with the CLI
+or web UI first. The plugin starts `docify mcp`; it does not install the CLI,
+download documentation or prepare embedding models.
+
+The catalog installs the plugin from `integrations/claude-code/docify` in the
+source repository. If `docify@docify-local` is already installed, uninstall that
+copy before switching to `docify@kolezka` to avoid loading it twice.
+
+**Needs:** Read access to the private repository, the Docify CLI on `PATH` and
+prepared documentation sources.
+
+[Source and plugin integration](https://github.com/kolezka/docify/tree/main/integrations/claude-code/docify)
 
 </details>
 
