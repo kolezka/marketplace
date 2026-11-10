@@ -1,0 +1,13 @@
+{
+  "name": "@kolezka/marketplace-dsh-compat",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Maintainer wrappers around the published claude-plugin-dsh CLI",
+  "type": "module",
+  "scripts": {
+    "test": "node --test wrappers.test.mjs"
+  },
+  "dependencies": {
+    "claude-plugin-dsh": "0.1.0"
+  }
+}
