@@ -1,67 +1,94 @@
-# dsh-compat
+# DeepSeek Harness adapters
 
-Lets every kolezka plugin run in [DeepSeek Harness](https://github.com/deepseek-ai) (DSH)
-without changing how it runs in Claude Code.
+Each kolezka plugin can also run in [DeepSeek Harness](https://github.com/deepseek-ai)
+(DSH) through a `dsh/` directory next to its `.claude-plugin/`. Claude Code never reads
+`dsh/`, so the same tree keeps working in both harnesses.
 
-Each plugin repo has a `dsh/` directory:
+The runtime and its tools live in one place:
+[kolezka/claude-plugins-dsh](https://github.com/kolezka/claude-plugins-dsh). Adapters
+are refreshed from commit `a721298862b4dd3244ce3b48a184f95c512dc700`, which adds
+exec-form hooks (`command` plus `args`) and `onFailure: "block"`. The package version
+is still `0.1.0`; the npm `0.1.0` release may predate that commit, so build from the
+commit when exact behavior matters. Its README describes what maps to what and what
+is not mapped (function hooks, `PreCompact`, `Notification`, LSP servers, per-agent
+model pins). MCP servers from `.mcp.json` are not handled by the runtime; a plugin
+that needs one documents the manual setup in its own repository.
 
-```
-dsh/
-  package.json        DSH bundle manifest (dsh.bundle.patch)
-  cordis.patch.yml    plugin row, plus dsh-mcp-client rows for .mcp.json servers
-  index.js            createPlugin({...}) with the plugin's mapping choices
-  claude-compat.js    vendored copy of dsh-compat/claude-compat.js, never edit there
-  locale/en.json      title and description for the DSH plugin manager
-```
+This directory used to hold its own copy of the runtime. That copy fell behind and
+was removed; do not add one here again. The old scripts remain as thin wrappers, see
+[Old scripts](#old-scripts).
 
-Claude Code never reads `dsh/`, and the adapter only reads the plugin's own
-`skills/`, `commands/`, `agents/`, `hooks/hooks.json` and instruction files. So one
-tree serves both harnesses and there is nothing to keep in sync by hand.
+## Adapters by plugin
 
-## What maps to what
+Each adapter belongs in the plugin's own repository, at the plugin root the catalog
+installs from. Adapters for the a721298 runtime are added or refreshed in separate
+per-plugin pull requests. Until one is merged, that plugin's adapter may be missing
+or out of date on its catalog ref.
 
-| Claude Code | DSH |
-|---|---|
-| `skills/<n>/SKILL.md` | skill, rank 450 (a same-named skill in `~/.dsh/skills` still wins) |
-| `commands/<n>.md` | `/<plugin>-<n>` slash command; the body is sent as the next turn |
-| `agents/<n>.md` | skill `<plugin>-agent-<n>`: a role brief for `subagent` / `spawn_teammate` |
-| `CLAUDE.md`-style files listed in `index.js` | system prompt section, `<!--harness:claude-only-->` blocks removed |
-| `PreToolUse` hook | `tools/pre-execute`; `ask` becomes a DSH approval, `deny`/exit 2 denies |
-| `PostToolUse` hook | `tools/result` (fire and forget) |
-| `SessionStart`, `UserPromptSubmit` | first step of an agent / a step with a user message; context joins that step |
-| `Stop`, `SubagentStop` | `agent/turn-stopping`; `{"decision":"block"}` steers one more step |
-| `SessionEnd` | `agent/disposed` |
-| `.mcp.json` | `@deepseek-ai/dsh-mcp-client` rows in `cordis.patch.yml` |
+| Plugin | Repository | Catalog ref | Adapter |
+| --- | --- | --- | --- |
+| `block-docs` | `kolezka/block-docs` | `main` | `dsh/` |
+| `self-improvement-loop` | `kolezka/self-improvement-loop` | `release` | `dsh/` |
+| `worklog-persist` | `kolezka/worklog-persist` | `master` | `dsh/` |
+| `repo-intel` | `kolezka/repo-intel` | `main` | `dsh/` |
+| `agents-def` | `kolezka/claude-agents-def` | `main` | `dsh/` |
+| `kolezka-bootstrap` | `kolezka/kolezka-bootstrap` | `main` | `dsh/` |
+| `performance-analyzer` | `kolezka/claude-performance-analyzer` | `release` | `dsh/` |
+| `phased-delivery` | `kolezka/phased-delivery` | `main` | `dsh/` |
+| `agent-fleet` | `kolezka/agent-fleet` | `main` | `dsh/` |
+| `design-studio` | `kolezka/design-studio` | `main` | `dsh/` |
+| `docify` | `kolezka/docify` | `main` | `integrations/claude-code/docify/dsh/` |
+| `stealth-search` | `kolezka/claude-stealth-search-plugin` | `main` | `dsh/` |
 
-Hooks get Claude Code's stdin JSON (`session_id`, `cwd`, `hook_event_name`,
-`tool_name` with Claude names such as `Bash`, `tool_input`, `transcript_path`) and
-`CLAUDE_PLUGIN_ROOT`, plus `CLAUDE_HARNESS=dsh` so a script can tell the two apart.
-`transcript_path` is a Claude-shaped JSONL export of the DSH session under
-`$DSH_HOME/state/claude-compat/transcripts/`. It is rewritten for `Stop`,
-`SubagentStop` and `SessionEnd`; other events reuse the last export.
+An adapter reaches users only once it is on the catalog ref. Changes land on each
+repository's development branch first; plugins whose catalog ref is `release` ship
+an adapter change only after that repository cuts a release.
 
-Not mapped: function hooks (`hooks.json` `modules`), `PreCompact`, `Notification`,
-LSP servers, per-agent model pins. A plugin can turn off any part with the row config
-`disable: [skills, commands, agents, instructions, hooks]`.
+## Install into DSH
 
-## Install
+From a plugin checkout, through DSH's plugin manager:
 
-From the plugin checkout, with DSH's plugin manager (asks for approval):
-
-```
+```sh
 dsh plugin --profile web add file:/abs/path/to/plugin/dsh
 ```
 
-or, to load it in every profile, add a row to `~/.dsh/cordis.patch.yml`:
+Or for every profile, add a row to `~/.dsh/cordis.patch.yml`:
 
 ```yaml
 - insert:
     - id: claude-compat-<plugin>
-      name: file:///abs/path/to/plugin/dsh/index.js
+      name: "file:///abs/path/to/plugin/dsh/index.js"
 ```
 
-## Changing the runtime
+## Add or refresh an adapter
 
-Edit `dsh-compat/claude-compat.js` here, run `node --test dsh-compat/`, then copy it
-into every plugin with `dsh-compat/sync.sh <plugin-dir>...`. `sync.sh --check` fails on
-a drifted copy.
+Run the CLI from a checkout of `claude-plugins-dsh` at the commit above, after
+`pnpm install --frozen-lockfile && pnpm run build`:
+
+```sh
+cli=/path/to/claude-plugins-dsh/dist/bin/cli.js
+node "$cli" scaffold --scope @kolezka <plugin-root>   # new adapter
+node "$cli" sync <plugin-root>                        # refresh the vendored runtime
+node "$cli" sync --check <plugin-root>                # fail on drift
+node "$cli" inspect <plugin-root>                     # list registrations
+```
+
+`scaffold` writes `package.json`, `locale/en.json` and the runtime copy. Write
+`index.js` and `cordis.patch.yml` by hand. `inspect` imports the plugin's
+JavaScript, so run it only on code you trust.
+
+## Old scripts
+
+`sync.sh`, `scaffold.mjs` and `inspect.mjs` here still work, but they only forward to
+the canonical CLI. Point them at a built checkout first; there is no fallback to npm
+or a bundled copy:
+
+```sh
+export CLAUDE_PLUGINS_DSH_CLI=/path/to/claude-plugins-dsh/dist/bin/cli.js
+dsh-compat/sync.sh [--check] <plugin-root>...   # runs: sync [--check]
+node dsh-compat/scaffold.mjs <plugin-root>...   # runs: scaffold --scope @kolezka
+node dsh-compat/inspect.mjs <plugin-root>...     # runs: inspect
+```
+
+Unset, they exit 64; a missing path exits 66. Otherwise they return the CLI's exit
+code. `node --test dsh-compat/` checks this. New scripts should call the CLI directly.

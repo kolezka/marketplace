@@ -464,6 +464,14 @@ For a development marketplace, use its actual name in the uninstall command.
 
 </details>
 
+## DeepSeek Harness
+
+The plugins can also run in DeepSeek Harness through a `dsh/` adapter in each
+source repository, built on
+[claude-plugins-dsh](https://github.com/kolezka/claude-plugins-dsh). See
+[dsh-compat/README.md](dsh-compat/README.md) for adapter locations, install and
+refresh steps.
+
 ## Add a plugin
 
 This repository holds the catalog and its guide, not copies of plugin code.
