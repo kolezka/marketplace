@@ -14,13 +14,16 @@ is not mapped (function hooks, `PreCompact`, `Notification`, LSP servers, per-ag
 model pins). MCP servers from `.mcp.json` are not handled by the runtime; a plugin
 that needs one documents the manual setup in its own repository.
 
-This directory used to hold its own copy of the runtime and scripts. That copy fell
-behind and was removed. Do not add a runtime copy here again.
+This directory used to hold its own copy of the runtime. That copy fell behind and
+was removed; do not add one here again. The old scripts remain as thin wrappers, see
+[Old scripts](#old-scripts).
 
 ## Adapters by plugin
 
-Each adapter lives in the plugin's own repository, at the plugin root the catalog
-installs from.
+Each adapter belongs in the plugin's own repository, at the plugin root the catalog
+installs from. Adapters for the a721298 runtime are added or refreshed in separate
+per-plugin pull requests. Until one is merged, that plugin's adapter may be missing
+or out of date on its catalog ref.
 
 | Plugin | Repository | Catalog ref | Adapter |
 | --- | --- | --- | --- |
@@ -73,3 +76,19 @@ node "$cli" inspect <plugin-root>                     # list registrations
 `scaffold` writes `package.json`, `locale/en.json` and the runtime copy. Write
 `index.js` and `cordis.patch.yml` by hand. `inspect` imports the plugin's
 JavaScript, so run it only on code you trust.
+
+## Old scripts
+
+`sync.sh`, `scaffold.mjs` and `inspect.mjs` here still work, but they only forward to
+the canonical CLI. Point them at a built checkout first; there is no fallback to npm
+or a bundled copy:
+
+```sh
+export CLAUDE_PLUGINS_DSH_CLI=/path/to/claude-plugins-dsh/dist/bin/cli.js
+dsh-compat/sync.sh [--check] <plugin-root>...   # runs: sync [--check]
+node dsh-compat/scaffold.mjs <plugin-root>...   # runs: scaffold --scope @kolezka
+node dsh-compat/inspect.mjs <plugin-root>...     # runs: inspect
+```
+
+Unset, they exit 64; a missing path exits 66. Otherwise they return the CLI's exit
+code. `node --test dsh-compat/` checks this. New scripts should call the CLI directly.
