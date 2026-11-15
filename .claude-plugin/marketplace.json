@@ -126,6 +126,28 @@
         "ref": "main"
       },
       "category": "productivity"
+    },
+    {
+      "name": "umami",
+      "description": "Administer Umami analytics through its REST API: websites, stats, teams and users, with confirmation before deletes and resets. Needs UMAMI_API_TOKEN and Node.js",
+      "source": {
+        "source": "git-subdir",
+        "url": "kolezka/agents-umami-plugins",
+        "path": "plugins/umami",
+        "ref": "main"
+      },
+      "category": "productivity"
+    },
+    {
+      "name": "plugin-release",
+      "description": "Set up and run semver releases for plugin repos: version bumps across manifests, CHANGELOG and GitHub releases from a manual workflow",
+      "source": {
+        "source": "git-subdir",
+        "url": "kolezka/plugin-release-skill",
+        "path": "plugins/plugin-release",
+        "ref": "main"
+      },
+      "category": "development"
     }
   ]
 }

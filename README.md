@@ -59,6 +59,13 @@ namespace, for example `/block-docs:block-docs`.
 | [agents-def](#agents-def) | Delegate bounded engineering tasks to role-specific subagents. | Public |
 | [phased-delivery](#phased-delivery) | Run a long change one phase at a time, with review and verification between phases. | Private |
 | [agent-fleet](#agent-fleet) | Supervise parallel agents in tmux on a local or remote host. | Private |
+| [plugin-release](#plugin-release) | Add versioned releases with a changelog and GitHub releases to a plugin repo. | Public |
+
+### Operate services
+
+| Plugin | When to use it | Access |
+| --- | --- | --- |
+| [umami](#umami) | Read Umami analytics and manage websites, teams and users from chat. | Public |
 
 > **Private plugins need repository access.** This catalog is public, but it does
 > not grant access to private source repositories. Use Git credentials with read
@@ -432,6 +439,73 @@ Bash 4+, tmux, ripgrep and Claude Code. A remote supervisor also needs key-based
 SSH access. Local-only fleets do not need a separate host.
 
 [Source, host setup and fleet CLI](https://github.com/kolezka/agent-fleet#readme)
+
+</details>
+
+### plugin-release
+
+Give a Claude Code plugin or marketplace repo versioned releases. The skill finds
+every version field, adds a manual GitHub Actions workflow that bumps patch, minor
+or major in all of them at once, writes `CHANGELOG.md` from Conventional Commits
+and creates the GitHub release.
+
+<details>
+<summary>Install and set up releases</summary>
+
+```text
+/plugin install plugin-release@kolezka
+/reload-plugins
+```
+
+In the plugin repo, on a new branch, ask:
+
+```text
+Use plugin-release to set up versioned releases for this repo.
+```
+
+The agent shows version files that disagree and asks before tagging the current
+version. It proves the setup on a throwaway clone, then in a pull-request dry run.
+After merging, start a release from the Actions tab, or ask it to cut one.
+
+**Needs:** `gh` authenticated for the repo, Bun, and permission for
+`github-actions[bot]` to push to the default branch. A protected branch needs the
+bot in its ruleset bypass list.
+
+[Source and workflow template](https://github.com/kolezka/plugin-release-skill#readme)
+
+</details>
+
+### umami
+
+Administer an Umami analytics instance, self-hosted or Umami Cloud, through its
+REST API: visitors, pageviews and top pages, websites, teams and users.
+
+<details>
+<summary>Install and ask about your traffic</summary>
+
+```text
+/plugin install umami@kolezka
+/reload-plugins
+```
+
+Before starting a new Claude Code session, export `UMAMI_API_TOKEN` (an Umami API
+key) and, for a self-hosted instance, `UMAMI_API_URL`, for example
+`https://umami.example.com`. Without `UMAMI_API_URL` the plugin uses Umami Cloud.
+Never commit the token.
+
+Then ask:
+
+```text
+How many visitors did example.com have in the last 30 days, and which pages led?
+```
+
+Deletes, resets and other destructive calls need explicit confirmation, and the
+agent shows the website or team first. Credentials in API responses are redacted.
+
+**Needs:** Node.js 20+ on `PATH` and an Umami API key. On self-hosted Umami, API
+keys cannot reach `/api/admin/*` routes.
+
+[Source, tools and configuration](https://github.com/kolezka/agents-umami-plugins#readme)
 
 </details>
 
