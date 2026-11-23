@@ -31,7 +31,7 @@ dsh/
   "type": "module",
   "exports": { ".": "./index.js", "./locale/*.json": "./locale/*.json" },
   "files": ["index.js", "bun.lock", "cordis.patch.yml", "locale/*.json"],
-  "dependencies": { "claude-plugin-dsh": "0.1.0" },
+  "dependencies": { "claude-plugin-dsh": "0.3.0" },
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
 }
 ```
@@ -102,7 +102,7 @@ Check what an installed adapter registers, without starting DSH. This imports th
 plugin's JavaScript, so run it only on trusted plugins:
 
 ```sh
-bun x claude-plugin-dsh@0.1.0 inspect /abs/path/to/plugin
+bun x claude-plugin-dsh@0.3.0 inspect /abs/path/to/plugin
 ```
 
 ## Updating the runtime
@@ -117,7 +117,7 @@ bun add --exact claude-plugin-dsh@<version>
 
 Commit `dsh/package.json` and `dsh/bun.lock`.
 
-Do not run the package's `scaffold` or `sync` commands on these adapters. In 0.1.0 they
+Do not run the package's `scaffold` or `sync` commands on these adapters. They
 write a vendored `dsh/claude-compat.js`, which direct-dependency adapters do not use.
 
 ## Maintainer scripts
