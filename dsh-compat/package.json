@@ -8,6 +8,6 @@
     "test": "node --test wrappers.test.mjs"
   },
   "dependencies": {
-    "claude-plugin-dsh": "0.1.0"
+    "claude-plugin-dsh": "0.3.0"
   }
 }
