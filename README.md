@@ -58,6 +58,7 @@ namespace, for example `/block-docs:block-docs`.
 | --- | --- | --- |
 | [agents-def](#agents-def) | Delegate bounded engineering tasks to role-specific subagents. | Public |
 | [phased-delivery](#phased-delivery) | Run a long change one phase at a time, with review and verification between phases. | Private |
+| [delegate-dsh](#delegate-dsh) | Send a task to DeepSeek Harness and watch its progress beside the chat. | Public |
 | [agent-fleet](#agent-fleet) | Supervise parallel agents in tmux on a local or remote host. | Private |
 | [plugin-release](#plugin-release) | Add versioned releases with a changelog and GitHub releases to a plugin repo. | Public |
 
@@ -407,6 +408,14 @@ worker/reviewer agents. It does not push or open PRs unless asked.
 [Source, resume and workflow modes](https://github.com/kolezka/phased-delivery#readme)
 
 </details>
+
+### delegate-dsh
+
+Install `/plugin install delegate-dsh@kolezka`, then use `/plugin configure delegate-dsh@kolezka` to set your DSH HTTPS address and launch token. Enter the token in the masked field, not in chat. Run `/reload-plugins` after setup.
+
+Send a first task with `/delegate-dsh:start List the folders in your default workspace.` The plugin returns the session ID when DSH accepts the prompt. Its built-in pane follows tasks from this conversation; `/dsh-tasks` reopens it. No separate panel plugin or SSH tunnel is needed.
+
+**Needs:** Bun, a POSIX shell, network access to a DSH web instance and its launch token. [Source and setup (public)](https://github.com/kolezka/claude-delegate-dsh#readme)
 
 ### agent-fleet
 

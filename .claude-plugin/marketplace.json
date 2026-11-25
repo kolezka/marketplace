@@ -87,6 +87,16 @@
       "category": "development"
     },
     {
+      "name": "delegate-dsh",
+      "description": "Send a prompt to a remote DeepSeek Harness session and follow its progress in a live pane. Needs Bun and a DSH web instance",
+      "source": {
+        "source": "github",
+        "repo": "kolezka/claude-delegate-dsh",
+        "ref": "main"
+      },
+      "category": "development"
+    },
+    {
       "name": "agent-fleet",
       "description": "Supervise several autonomous Claude Code agents in tmux on a local or remote host from one session: watchdog, Monitor, message relay, owner decisions, claim verification and supervisor handoff. Pairs with phased-delivery. Private repository",
       "source": {
